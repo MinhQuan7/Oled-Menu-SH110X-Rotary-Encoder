@@ -7,6 +7,7 @@
 #define UTC_OFFSET_DST 0      // No daylight saving time in Vietnam
 #include <WiFi.h>
 
+//_______________________SSD:1306______________________
 const int SCREEN_WIDTH = 128;
 const int SCREEN_HEIGHT = 64;
 const int OLED_RESET = -1;
