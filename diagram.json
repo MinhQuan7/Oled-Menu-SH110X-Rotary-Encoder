@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "author": "Alessandro Pucci",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": -28.8, "left": -100.76, "attrs": {} },
+    { "type": "wokwi-ky-040", "id": "encoder1", "top": 241.7, "left": -0.8, "attrs": {} },
+    {
+      "type": "board-ssd1306",
+      "id": "oled1",
+      "top": 89.54,
+      "left": 38.63,
+      "attrs": { "i2cAddress": "0x3c" }
+    }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "encoder1:CLK", "esp:25", "green", [ "h28.8", "v-48", "h-259.2", "v-124.8" ] ],
+    [ "encoder1:DT", "esp:26", "gold", [ "h19.2", "v-47.9", "h-259.2", "v-124.8" ] ],
+    [ "encoder1:SW", "esp:27", "orange", [ "h9.6", "v-47.9", "h-259.2", "v-124.8" ] ],
+    [ "encoder1:VCC", "esp:3V3", "red", [ "h28.8", "v58", "h-307.2", "v-336", "h9.6" ] ],
+    [ "encoder1:GND", "esp:GND.1", "black", [ "h19.2", "v39.2", "h-288", "v-201.6" ] ],
+    [ "oled1:SCL", "esp:22", "green", [ "v0" ] ],
+    [ "oled1:SDA", "esp:21", "gold", [ "v-48", "h0.07" ] ],
+    [ "oled1:VCC", "esp:3V3", "red", [ "v-134.4", "h-182.25" ] ],
+    [ "oled1:GND", "esp:GND.3", "black", [ "v-38.4" ] ]
+  ],
+  "dependencies": {}
+}
