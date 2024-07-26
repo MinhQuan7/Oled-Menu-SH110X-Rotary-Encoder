@@ -305,7 +305,7 @@ void setup_encoder()
 void displayMenu() {
   display.clearDisplay();
   display.setTextSize(1);
-  display.setTextColor(SSD1306_WHITE);
+  display.setTextColor(SH110X_WHITE);
   display.setCursor(0, 0);
 
   int startIndex = menuIndex > 0 ? menuIndex - 1 : 0;
@@ -314,31 +314,31 @@ void displayMenu() {
   float percentVisible = (float)(endIndex - startIndex + 1) / numMenus;
   int scrollbarInnerHeight = SCROLLBAR_HEIGHT * percentVisible;
 
-  display.drawRoundRect(SCROLLBAR_X, SCROLLBAR_Y, SCROLLBAR_WIDTH, SCROLLBAR_HEIGHT, 1, SSD1306_WHITE);
+  display.drawRoundRect(SCROLLBAR_X, SCROLLBAR_Y, SCROLLBAR_WIDTH, SCROLLBAR_HEIGHT, 1, SH110X_WHITE);
 
   int scrollbarPosition = map(startIndex, 0, numMenus - (endIndex - startIndex + 1), SCROLLBAR_Y, SCROLLBAR_Y + SCROLLBAR_HEIGHT - scrollbarInnerHeight);
 
-  display.fillRect(SCROLLBAR_INNER_X, scrollbarPosition, SCROLLBAR_INNER_WIDTH, scrollbarInnerHeight, SSD1306_WHITE);
+  display.fillRect(SCROLLBAR_INNER_X, scrollbarPosition, SCROLLBAR_INNER_WIDTH, scrollbarInnerHeight, SH110X_WHITE);
 
   for (int i = startIndex; i <= endIndex; i++) {
     if (i == menuIndex) {
-      display.drawRoundRect(0, (i - startIndex) * 20 + 10, 128, 20, 3, SSD1306_WHITE);
+      display.drawRoundRect(0, (i - startIndex) * 20 + 10, 128, 20, 3, SH110X_WHITE);
     }
 
     if (menus[i] == " Time") {
-      display.drawBitmap(0, (i - startIndex) * 20 + 12, image_date_day_bits, 16, 16, SSD1306_WHITE);
+      display.drawBitmap(0, (i - startIndex) * 20 + 12, image_date_day_bits, 16, 16, SH110X_WHITE);
       display.setCursor(20, (i - startIndex) * 20 + 16);
     } else if (menus[i] == " Robot") {
-      display.drawBitmap(0, (i - startIndex) * 20 + 12, bitmap_icon_robot, 16, 16, SSD1306_WHITE);
+      display.drawBitmap(0, (i - startIndex) * 20 + 12, bitmap_icon_robot, 16, 16, SH110X_WHITE);
       display.setCursor(20, (i - startIndex) * 20 + 16);
     } else if (menus[i] == " Information") {
-      display.drawBitmap(0, (i - startIndex) * 20 + 12, image_phone_contacts_bits, 16, 16, SSD1306_WHITE);
+      display.drawBitmap(0, (i - startIndex) * 20 + 12, image_phone_contacts_bits, 16, 16, SH110X_WHITE);
       display.setCursor(20, (i - startIndex) * 20 + 16);
     } else if (menus[i] == " Settings") {
-      display.drawBitmap(0, (i - startIndex) * 20 + 12, image_menu_settings_gear_bits, 16, 16, SSD1306_WHITE);
+      display.drawBitmap(0, (i - startIndex) * 20 + 12, image_menu_settings_gear_bits, 16, 16, SH110X_WHITE);
       display.setCursor(20, (i - startIndex) * 20 + 16);
     } else if (menus[i] == " Languages") {
-      display.drawBitmap(0, (i - startIndex) * 20 + 12, image_network_www_bits, 16, 16, SSD1306_WHITE);
+      display.drawBitmap(0, (i - startIndex) * 20 + 12, image_network_www_bits, 16, 16, SH110X_WHITE);
       display.setCursor(20, (i - startIndex) * 20 + 16);
     } else {
       display.setCursor(4, (i - startIndex) * 20 + 16);
@@ -381,7 +381,6 @@ void rotary_loop() {
         }
       }
     }
-
     previousRotaryValue = currentRotaryValue;
     rotaryIdleStartTime = millis();
   }
@@ -390,7 +389,7 @@ void rotary_loop() {
 void displaySubMenu() {
   display.clearDisplay();
   display.setTextSize(1);
-  display.setTextColor(SSD1306_WHITE);
+  display.setTextColor(SH110X_WHITE);
   display.setCursor(0, 0);
 
   int startIndex_Sub1 = menuIndex_subMenu > 0 ? menuIndex_subMenu - 1 : 0;
@@ -399,15 +398,15 @@ void displaySubMenu() {
   float percentVisible = (float)(endIndex_Sub1 - startIndex_Sub1 + 1) / numSubMenus[menuIndex];
   int scrollbarInnerHeight = SCROLLBAR_HEIGHT * percentVisible;
 
-  display.drawRoundRect(SCROLLBAR_X, SCROLLBAR_Y, SCROLLBAR_WIDTH, SCROLLBAR_HEIGHT, 1, SSD1306_WHITE);
+  display.drawRoundRect(SCROLLBAR_X, SCROLLBAR_Y, SCROLLBAR_WIDTH, SCROLLBAR_HEIGHT, 1, SH110X_WHITE);
 
   int scrollbarPosition = map(startIndex_Sub1, 0, numSubMenus[menuIndex] - (endIndex_Sub1 - startIndex_Sub1 + 1), SCROLLBAR_Y, SCROLLBAR_Y + SCROLLBAR_HEIGHT - scrollbarInnerHeight);
 
-  display.fillRect(SCROLLBAR_INNER_X, scrollbarPosition, SCROLLBAR_INNER_WIDTH, scrollbarInnerHeight, SSD1306_WHITE);
+  display.fillRect(SCROLLBAR_INNER_X, scrollbarPosition, SCROLLBAR_INNER_WIDTH, scrollbarInnerHeight, SH110X_WHITE);
 
   for (int i = startIndex_Sub1; i <= endIndex_Sub1; i++) {
     if (i == menuIndex_subMenu) {
-      display.drawRoundRect(0, (i - startIndex_Sub1) * 12 + 12, 120, 11, 3, SSD1306_WHITE);
+      display.drawRoundRect(0, (i - startIndex_Sub1) * 12 + 12, 120, 11, 3, SH110X_WHITE);
     }
     display.setCursor(4, (i - startIndex_Sub1) * 12 + 14);
     display.print(subMenus[menuIndex][i]);
@@ -488,8 +487,8 @@ void adjust_Brightness() {
   if (currentBrightness > 255) {
     currentBrightness = 0;
   }
-  display.ssd1306_command(SSD1306_SETCONTRAST);
-  display.ssd1306_command(currentBrightness);
+  // display.ssd1306_command(SSD1306_SETCONTRAST);
+  // display.ssd1306_command(currentBrightness);
 }
 
 void handle_rotary_button() {
@@ -529,20 +528,20 @@ void graphic_weatherSystem() {
   // Print the current time to the serial monitor
   Serial.println(&timeinfo, "Time: %A, %B %d %Y %H:%M:%S");
   // Draw other weather system information
-  display.setTextColor(SSD1306_WHITE);
-  display.drawBitmap(162, 74, image_battery_50_bits, 24, 16, SSD1306_WHITE);
-  display.drawBitmap(140, 74, image_bluetooth_bits, 14, 16, SSD1306_WHITE);
-  display.drawLine(0, 17, 128, 17, SSD1306_WHITE);
+  //display.setTextColor(SH110X_WHITE);
+  display.drawBitmap(162, 74, image_battery_50_bits, 24, 16, SH110X_WHITE);
+  display.drawBitmap(140, 74, image_bluetooth_bits, 14, 16, SH110X_WHITE);
+  display.drawLine(0, 17, 128, 17, SH110X_WHITE);
   display.setCursor(4, 6);
   display.print("Working Time");
   display.setCursor(5, 22);
   display.print(&timeinfo, "Date: %A");
   display.setCursor(29, 36);
   display.print(&timeinfo, "  %B %d  %Y ");
-  display.drawBitmap(101, 1, image_battery_full_bits, 24, 16, SSD1306_WHITE);
+  display.drawBitmap(101, 1, image_battery_full_bits, 24, 16, SH110X_WHITE);
   display.setCursor(5, 50);
   display.print(&timeinfo, "Time: %H:%M:%S");
-  display.drawBitmap(85, 1, image_bluetooth_bits, 14, 16, SSD1306_WHITE);
+  display.drawBitmap(85, 1, image_bluetooth_bits, 14, 16, SH110X_WHITE);
 
   // Update the display with the drawn graphics
   display.display();

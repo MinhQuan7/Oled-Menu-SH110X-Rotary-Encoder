@@ -1,9 +1,9 @@
 #ifndef MENU_H
 #define MENU_H
 
-#include <Adafruit_SSD1306.h>
+#include <Adafruit_SH110X.h>
 
-extern Adafruit_SSD1306 display;
+extern Adafruit_SH1106G display;
 
 void displayMenu();
 void rotary_loop();

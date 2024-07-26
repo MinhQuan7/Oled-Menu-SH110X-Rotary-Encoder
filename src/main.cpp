@@ -1,18 +1,45 @@
-#include <Adafruit_SSD1306.h>
+// Enable debug console
+// Set CORE_DEBUG_LEVEL = 3 first
+
+#define ERA_DEBUG
+#define DEFAULT_MQTT_HOST "mqtt1.eoh.io"
+// You should get Auth Token in the ERa App or ERa Dashboard
+#define ERA_AUTH_TOKEN "b8b27612-4a2a-4682-8043-f6390e4c78b2"
+
+#include <Arduino.h>
+#include <SPI.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SH110X.h>
 #include "Menu.h"
 #include <U8g2lib.h>
+#include <ERa.hpp>
+#include <ERa/ERaTimer.hpp>
+#include "DHT.h"
+
+#define DHTPIN 4
+#define DHTTYPE DHT11   
+const char ssid[] = "eoh.io";
+const char pass[] = "Eoh@2020";
+//___________________DHT11____________
+
+
 //_____________________INCLUDE NTP SERVER__________________
 #define NTP_SERVER     "pool.ntp.org"
 #define UTC_OFFSET     25200  // 7 hours * 3600 seconds = 25200 seconds
 #define UTC_OFFSET_DST 0      // No daylight saving time in Vietnam
-#include <WiFi.h>
 
 //_______________________SSD:1306______________________
-const int SCREEN_WIDTH = 128;
-const int SCREEN_HEIGHT = 64;
-const int OLED_RESET = -1;
-#define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
-U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE); // initialization for t
+#define i2c_Address 0x3c //initialize with the I2C addr 0x3C Typically eBay OLED's
+//#define i2c_Address 0x3d //initialize with the I2C addr 0x3D Typically Adafruit OLED's
+
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 64 // OLED display height, in pixels
+#define OLED_RESET -1   //   QT-PY / XIAO
+
+Adafruit_SH1106G display = Adafruit_SH1106G(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+
+U8G2_SH1106_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE); // initialization for SH1106
 
 static const unsigned char PROGMEM image_data_EYES_FRONTarray[] = { 
   // ARRAY for 2nd Array EYES_FRONT 
@@ -81,58 +108,87 @@ static const unsigned char PROGMEM image_data_EYES_FRONTarray[] = {
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
 };
-
-//declare function 
 void connect_toWifi();
 void syncTimeWithNTP();
-
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
-
+void readDHT11();
+DHT dht(DHTPIN, DHTTYPE);
 void setup() {
+  dht.begin();
   Serial.begin(115200);
-  display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS);
-  connect_toWifi() ;
-  //_____________SETUP WIFI_______________
-  //WiFi.begin(ssid, password); /Su dung khi ra ngoai mach that
-  WiFi.begin("Wokwi-GUEST", "", 6);//Su dung voi tai khoan guess cua wokki
-  // Initialize and configure the time
-  syncTimeWithNTP();
-  // Đồng bộ thời gian từ NTP server
-  if (WiFi.status() == WL_CONNECTED) {
-    syncTimeWithNTP();
-  } else {
-    Serial.println("Using RTC for timekeeping");
-  }
+  ERa.begin(ssid,pass);
+  Wire.begin(); // Initialize I2C
+  delay(1000);
   u8g2.begin();
-  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
-    Serial.println(F("SSD1306 allocation failed"));
+  if (!display.begin(i2c_Address, OLED_RESET)) {
+    Serial.println(F("SH1106 allocation failed"));
     for (;;);
   }
+
+  display.clearDisplay();
+  display.drawBitmap(0, 0, image_data_EYES_FRONTarray, 128, 64, 1);
+  display.setCursor(5, 50);
+  display.println("Connecting to WiFi...");
+  display.display();
+  connect_toWifi();
+  syncTimeWithNTP();
   setup_encoder();
   display.clearDisplay();
   display.display();
   delay(1000);
   display.clearDisplay();
+  
 }
 
+void readDHT11()
+{
+  const long  currentMillis =  0;
+  const long checktimeOut = 2000;
+  // Reading temperature or humidity takes about 250 milliseconds!
+  // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
+ float h = dht.readHumidity();
+  // Read temperature as Celsius (the default)
+  float t = dht.readTemperature();
+  // Read temperature as Fahrenheit (isFahrenheit = true)
+  float f = dht.readTemperature(true);
+
+  // Check if any reads failed and exit early (to try again).
+  if (isnan(h) || isnan(t) || isnan(f)) {
+    Serial.println(F("Failed to read from DHT sensor!"));
+    return;
+  }
+
+  // Compute heat index in Fahrenheit (the default)
+  float hif = dht.computeHeatIndex(f, h);
+  // Compute heat index in Celsius (isFahreheit = false)
+  float hic = dht.computeHeatIndex(t, h, false);
+
+  Serial.print(F("Humidity: "));
+  Serial.print(h);
+  Serial.print(F("%  Temperature: "));
+  Serial.print(t);
+  Serial.print(F("°C "));
+  delay(2000);
+  }
+
 void loop() {
+  ERa.run();
   rotary_loop();
   check_SubMenu();
   handle_rotary_button();
+  readDHT11();
   // Kiểm tra kết nối WiFi và đồng bộ thời gian nếu cần
   if (WiFi.status() != WL_CONNECTED) {
       connect_toWifi();
-    if (WiFi.status() == WL_CONNECTED) {
-      syncTimeWithNTP();
-    }
-    delay(500);
+      if (WiFi.status() == WL_CONNECTED) {
+          syncTimeWithNTP();
+      }
   }
 }
 
-//_____________________________Void connect to wifi__________________
 void connect_toWifi() {
-  WiFi.begin("Wokwi-GUEST", "", 6);//Su dung voi tai khoan guess cua wokki
-  while (WiFi.status() != WL_CONNECTED) {
+  WiFi.begin(ssid, pass);
+  int retries = 10; // Số lần thử kết nối
+  while (WiFi.status() != WL_CONNECTED && retries > 0) {
     delay(1000);
     display.clearDisplay();
     display.drawBitmap(0, 0, image_data_EYES_FRONTarray, 128, 64, 1);
@@ -140,13 +196,17 @@ void connect_toWifi() {
     display.println("Connecting to WiFi...");
     Serial.println("Connecting to WiFi...");
     display.display();
+    retries--;
   }
-  Serial.println("Connected to WiFi");
-}
 
-//_____________________________Sync Time ____________________________
-void syncTimeWithNTP()
-{
+  if (WiFi.status() == WL_CONNECTED) {
+    Serial.println("Connected to WiFi");
+  } else {
+    Serial.println("Failed to connect to WiFi");
+  }
+
+}
+void syncTimeWithNTP() {
   configTime(UTC_OFFSET, UTC_OFFSET_DST, NTP_SERVER);
   struct tm timeinfo;
   if (!getLocalTime(&timeinfo)) {
@@ -156,4 +216,3 @@ void syncTimeWithNTP()
   // Print the current time
   Serial.println(&timeinfo, "Time: %A, %B %d %Y %H:%M:%S");
 }
-
