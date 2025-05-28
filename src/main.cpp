@@ -4,7 +4,7 @@
 #define ERA_DEBUG
 #define DEFAULT_MQTT_HOST "mqtt1.eoh.io"
 // You should get Auth Token in the ERa App or ERa Dashboard
-#define ERA_AUTH_TOKEN "b8b27612-4a2a-4682-8043-f6390e4c78b2"
+#define ERA_AUTH_TOKEN "my_auth_token"
 
 #include <Arduino.h>
 #include <SPI.h>
@@ -19,8 +19,8 @@
 
 #define DHTPIN 4
 #define DHTTYPE DHT11   
-const char ssid[] = "eoh.io";
-const char pass[] = "Eoh@2020";
+const char ssid[] = "___your_ssid_Wifi";
+const char pass[] = "___your_password_wifi";
 //___________________DHT11____________
 
 
